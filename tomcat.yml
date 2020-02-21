@@ -1,0 +1,29 @@
+---
+- hosts: node2
+  become: yes
+  become_user: sunny
+  gather_facts: true
+  tasks:
+    - name: install jdk
+      apt:
+        update_cache: yes
+        name: "{{item}}"
+        state: present
+      with_items:
+        - openjdk-8-jdk
+        - zip
+        - unzip
+      ignore_errors: yes
+
+    - name: wget the tomcat url
+      get_url:
+        url: http://mirrors.estointernet.in/apache/tomcat/tomcat-8/v8.5.51/bin/apache-tomcat-8.5.51.tar.gz
+        dest: /home/sunny
+    - name: unzip the tomcat url
+      unarchive:
+        src: /home/sunny/apache-tomcat-8.5.51.tar.gz
+        dest: /home/sunny
+        remote_src: yes
+      
+    - name: start the tomcat
+      shell: echo /home/sunny/apache-tomcat-8.5.51/bin/startup.sh
